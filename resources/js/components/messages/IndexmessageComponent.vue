@@ -7,7 +7,7 @@
             <div class="card-header text-secondary">
                 <div class="float-left">
                     <p><strong> {{CURRENT_CHAT.title}} </strong></p>
-                    <p> {{MEMBERS.length+1}} members </p>
+                    <p @click="showGroupInfo"> {{MEMBERS.length}} members, {{onlineUsers.length}} online</p>
                 </div>
                 <div class="float-right">
                     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg" v-if="editable" @click="editChat">
@@ -16,8 +16,14 @@
                     </svg>
                 </div>
             </div>
+            <GroupInfo 
+                v-if="shownGroupInfo"
+                :online="onlineUsers"
+                :members_data="MEMBERS"
+                @close="closeInfo"
+            />
             <div class="card-body" id="cardBody" ref="messages">
-                <span class="badge badge-light first" v-if="!MESSAGES.length">Please write your first message </span>
+                <span class="badge badge-light first" v-if="!messagesArray.length">Please write your first message </span>
                 <Message
                     @editMsg="editMsg"
                     @deleteMsg="deleteMsg"
@@ -90,11 +96,13 @@ import {mapGetters, mapActions} from 'vuex'
 import axios from 'axios'
 
 import Message from './MessageComponent'
+import GroupInfo from './GroupInfoComponent'
 
 export default {
     name: 'IndexmessageComponent',
     components: {
-        Message
+        Message,
+        GroupInfo
     },
     data() {
         return {
@@ -105,7 +113,8 @@ export default {
             nullError: false,
             trimError: false,
             messagesArray: [],
-            ugvugbu: []
+            onlineUsers: [],
+            shownGroupInfo: false
         }
     },
     computed: {
@@ -208,11 +217,23 @@ export default {
             let vm = this
             if (vm.CURRENT_CHAT.id) {
                 socket.on("chat."+ vm.CURRENT_CHAT.id + ":App\\Events\\NewMessage", function(data) {
-                console.log(data.message)
-                vm.messagesArray.unshift(data.message)
+                    console.log(data.message)
+                    if (data.message.chat_id ==  vm.CURRENT_CHAT.id) {
+                        vm.messagesArray.unshift(data.message)
+                    }
             });
+            // this.updateMembers();
             }
             // console.log(this.messagesArray.indexOf('0'))
+        },
+        updateMembers() {
+            this.MEMBERS.push(this.USER);
+        },
+        showGroupInfo() {
+            this.shownGroupInfo = !this.shownGroupInfo;
+        },
+        closeInfo() {
+            this.shownGroupInfo = false;
         }
     },
     mounted() {
@@ -225,6 +246,20 @@ export default {
         // });
 
         // this.scrollToEnd();
+        let vm = this
+        var socket = io('http://messenger2.test:3000');
+        socket.on("login:App\\Events\\OnlineUser", function(data){
+            console.log(data)
+            if (vm.onlineUsers.length == 0) {
+                vm.onlineUsers.push(data)
+            } else {
+                if (!vm.onlineUsers.includes(data)) {
+                    vm.onlineUsers.push(data)
+                }
+            }
+            
+        });
+
         this.GET_MESSAGES_FROM_API();
         this.GET_MEMBERS_FROM_API();
         

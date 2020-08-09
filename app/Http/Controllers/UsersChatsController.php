@@ -12,7 +12,7 @@ class UsersChatsController extends Controller
 {
     public function index($id)
     {
-        $chats = UsersChats::with('user')->select('id', 'user_id')->where('chat_id', $id)->get();
+        $chats = UsersChats::with('user')->where('chat_id', $id)->get()->pluck('user');
         // foreach($chats as $chat) {
         //     $chat->member = $chat->user->name;
         // }

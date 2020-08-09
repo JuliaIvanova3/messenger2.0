@@ -13,6 +13,9 @@
 <script>
 import indexChat from './chats/IndexchatComponent'
 import indexMessage from './messages/IndexmessageComponent'
+
+import {mapActions} from 'vuex'
+
 export default {
     name: 'dashboard',
     components: {
@@ -24,6 +27,14 @@ export default {
         //
         }
     },
+    methods: {
+        ...mapActions([
+            'GET_USER_FROM_API'
+        ])
+    },
+    created() {
+        this.GET_USER_FROM_API();
+    }
     
 }
 </script>

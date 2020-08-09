@@ -10,7 +10,10 @@ class UserController extends Controller
 {
     public function getAuthUser()
     {
-        return json_encode(Auth::user());
+        $user = Auth::user();
+        \App\Events\OnlineUser::dispatch($user);
+
+        return json_encode($user);
     }
 
     public function index()

@@ -35,6 +35,7 @@ let store =new Vuex.Store({
         },
         SET_MEMBERS_TO_STATE: (state, data) => {
             state.members = data;
+            state.members.unshift(state.user);
         },
         SET_NOT_USERS_TO_STATE: (state, data) => {
             state.notUsers = data;

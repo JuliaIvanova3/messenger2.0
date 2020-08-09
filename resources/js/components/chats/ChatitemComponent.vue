@@ -51,6 +51,11 @@ export default {
         },
         unread() {
             return this.chat_data.unread != 0;
+        },
+        checkUnread() {
+            if (this.chat_data.id == this.CURRENT_CHAT.id) {
+                this.chat_data.unread = 0;
+            }
         }
     },
     methods: {
@@ -59,6 +64,11 @@ export default {
         },
         editChat() {
             this.$router.push('/chat/edit');
+        }
+    },
+    watch: {
+        CURRENT_CHAT() {
+            this.checkUnread;
         }
     }
 }

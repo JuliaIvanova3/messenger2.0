@@ -37,10 +37,14 @@ export default {
         ]),
         connectAllChats() {
             var socket = io('http://messenger2.test:3000');
+            let vm = this;
             this.CHATS.filter(function (item) {
                 socket.on("chat."+ item.id + ":App\\Events\\NewMessage", function(data) {
                     console.log(data.message)
                     item.last_msg = data.message
+                    if (data.message.user_id != vm.USER.id && vm.CURRENT_CHAT.id != item.id) {
+                        item.unread++
+                    }
                 });
             })
         }
@@ -66,10 +70,11 @@ export default {
     },
     mounted() {
         this.GET_CHATS_FROM_API();
-        this.GET_USER_FROM_API();
+        // this.GET_USER_FROM_API();
+
     },
     updated() {
-        this.connectAllChats();
+        this.connectAllChats;
     }
 }
 </script>
